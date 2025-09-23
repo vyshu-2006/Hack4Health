@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Clinician Dashboard - Healthcare Triage Bot{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-chart-bar me-2"></i>
+                Clinician Review Dashboard
+            </h2>
+            <button id="refreshButton" class="btn btn-primary" aria-label="Refresh dashboard data" title="Refresh dashboard data">
+                <i class="fas fa-sync-alt me-1" aria-hidden="true"></i>
+                Refresh
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Summary Statistics -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6>Total Sessions</h6>
+                        <h3 id="totalSessions">0</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-comments fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6>Emergency Cases</h6>
+                        <h3 id="emergencyCases">0</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6>Urgent Cases</h6>
+                        <h3 id="urgentCases">0</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-clock fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6>Self-Care Cases</h6>
+                        <h3 id="selfCareCases">0</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-home fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters and Search -->
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h6>Filter by Urgency Level</h6>
+                <select id="urgencyFilter" class="form-select">
+                    <option value="">All Cases</option>
+                    <option value="emergency">Emergency</option>
+                    <option value="urgent">Urgent</option>
+                    <option value="outpatient">Outpatient</option>
+                    <option value="self-care">Self-Care</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h6>Search Sessions</h6>
+                <input type="text" id="searchInput" class="form-control" placeholder="Search by symptoms, session ID, or user ID...">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sessions List -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-list me-2"></i>Patient Sessions</h5>
+            </div>
+            <div class="card-body">
+                <div id="sessionsLoading" class="text-center py-3">
+                    <div class="spinner-border" role="status" aria-label="Loading patient sessions">
+                        <span class="visually-hidden">Loading sessions...</span>
+                    </div>
+                    <p class="mt-2">Loading patient sessions...</p>
+                </div>
+                <div id="sessionsContainer" class="d-none">
+                    <!-- Sessions will be loaded here -->
+                </div>
+                <div id="noSessions" class="text-center text-muted py-3 d-none">
+                    <i class="fas fa-inbox fa-3x mb-3"></i>
+                    <h5>No sessions found</h5>
+                    <p>No patient sessions match your current filters.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Session Detail Modal -->
+<div class="modal fade" id="sessionModal" tabindex="-1" aria-labelledby="sessionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sessionModalLabel">
+                    <i class="fas fa-eye me-2"></i>
+                    Session Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="sessionDetailLoading" class="text-center py-3">
+                    <div class="spinner-border" role="status" aria-label="Loading session details">
+                        <span class="visually-hidden">Loading session details...</span>
+                    </div>
+                    <p class="mt-2">Loading session details...</p>
+                </div>
+                <div id="sessionDetailContent" class="d-none">
+                    <!-- Session details will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="exportSessionButton" class="btn btn-primary" aria-label="Export session data" title="Export session data">
+                    <i class="fas fa-download me-1" aria-hidden="true"></i>
+                    Export Session
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/clinician.js') }}"></script>
+{% endblock %}
